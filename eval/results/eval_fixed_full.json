@@ -1,0 +1,48 @@
+{
+  "strategy": "fixed",
+  "n_questions": 36,
+  "recall_at_k": {
+    "dense": {
+      "recall@3": 0.5,
+      "recall@5": 0.6111,
+      "recall@10": 0.6667,
+      "n_questions": 36
+    },
+    "sparse": {
+      "recall@3": 0.6667,
+      "recall@5": 0.7222,
+      "recall@10": 0.8333,
+      "n_questions": 36
+    },
+    "hybrid": {
+      "recall@3": 0.6944,
+      "recall@5": 0.7778,
+      "recall@10": 0.8333,
+      "n_questions": 36
+    },
+    "hybrid_rerank": {
+      "recall@3": 0.7778,
+      "recall@5": 0.7778,
+      "recall@10": 0.8611,
+      "n_questions": 36
+    }
+  },
+  "faithfulness": {
+    "faithfulness_mean": 0.925,
+    "faithfulness_n": 36,
+    "faithfulness_by_category": {
+      "genetic": 0.878,
+      "diet_nutrition": 0.9737,
+      "sleep": 0.9028,
+      "physical_activity": 0.9364,
+      "cardiovascular_metabolic": 0.8592,
+      "lifestyle_environment": 1.0
+    },
+    "faithfulness_edge_case_vs_normal": {
+      "edge_case": 0.8561,
+      "normal": 0.9313
+    },
+    "judge_model": "gpt-oss:20b",
+    "generator_model": "qwen3:14b"
+  }
+}
