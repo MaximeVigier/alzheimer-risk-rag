@@ -42,7 +42,7 @@ def _get_faithfulness_metric():
         from ragas.llms import llm_factory
         from ragas.metrics.collections import Faithfulness
         client = openai.AsyncOpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
-        judge_llm = llm_factory(JUDGE_MODEL, provider="openai", client=client)
+        judge_llm = llm_factory(JUDGE_MODEL, provider="openai", client=client, max_tokens=4096)
         _faithfulness_metric = Faithfulness(llm=judge_llm)
     return _faithfulness_metric
 
@@ -101,7 +101,7 @@ async def compute_faithfulness(retriever: HybridRetriever, testset: list[dict], 
             continue  # pas de contexte -> pas de faithfulness calculable
 
         context = "\n\n".join(
-            f"[{s['pmid']}] {s['title']}" for s in result["sources_retrieved"]
+            f"[{s['pmid']}] {s['title']}\n{s['text']}" for s in result["sources_retrieved"]
         )
         try:
             score = await metric.ascore(
