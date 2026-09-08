@@ -1,0 +1,21 @@
+# Environnement
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# Données volumineuses / régénérables (voir README pour les régénérer)
+data/raw/
+data/processed/
+data/chroma/
+data/bm25_cache/
+
+# Logs
+*.log
+
+# Cache modèles
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
