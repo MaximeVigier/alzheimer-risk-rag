@@ -7,3 +7,10 @@ rank_bm25>=0.2.2
 matplotlib>=3.8
 seaborn>=0.13
 ollama>=0.3
+ragas==0.4.3
+datasets
+langchain-core==0.3.86
+langchain-openai==0.2.14
+langchain-community==0.3.27
+langchain==0.3.27
+umap-learn>=0.5

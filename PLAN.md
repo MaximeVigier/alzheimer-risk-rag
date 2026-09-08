@@ -185,6 +185,16 @@ comme dans un papier ou un rapport de bootcamp (cf. style du projet COVID) :
   → évite le biais d'auto-évaluation (un modèle qui juge ses propres réponses tend à se sur-noter).
   Point méthodologique à expliciter dans le README, c'est un vrai argument de rigueur en entretien.
 
+## Note d'installation (Windows, sans compilateur C++)
+`ragas` déclare `scikit-network` comme dépendance directe, mais ce paquet nécessite un compilateur
+C++ (Visual Studio Build Tools) absent sur les machines de dev Windows sans setup C++. Contournement
+utilisé ici : installer `ragas` et les paquets `langchain*` listés en `requirements.txt` avec des
+versions épinglées compatibles entre elles (sinon conflits d'imports type `ContextOverflowError`,
+`ChatVertexAI` manquant). `scikit-network` n'est en réalité utilisé que par des fonctionnalités
+avancées de ragas (construction de knowledge graph) non utilisées ici — l'import des métriques
+(Faithfulness, AnswerRelevancy, etc.) fonctionne sans lui. Sur Linux (Docker), scikit-network devrait
+compiler normalement avec `build-essential` installé — pas besoin du contournement dans le conteneur.
+
 ## Ce que ce projet coche dans PROFIL.md
 - NLP/LLM/RAG : preuve publique concrète (trou identifié en priorité)
 - Docker : usage réel, pas un `docker run hello-world`
