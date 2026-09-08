@@ -75,3 +75,9 @@ configurable dans `src/generate.py`) et le modèle juge pour l'évaluation (`gpt
 - Le tagging automatique des catégories de facteurs de risque est fait par mots-clés, non
   mutuellement exclusif — la catégorie "genetic" (APOE) domine le corpus.
 - Corpus limité aux abstracts (pas de full-text), donc contexte parfois incomplet.
+- **Retrieval faible sur les questions en français** (corpus 100% anglais). Le retrieval dense
+  (bi-encoder cross-lingual) reste correct, mais BM25 (composante sparse du mode hybride) est
+  purement lexical sur les tokens anglais et ne matche pas "tabac"/"MA" contre smoking/AD — le
+  score RRF chute sous le seuil de confiance et le système refuse plutôt que de mal répondre
+  (comportement voulu du garde-fou, mais couverture linguistique à améliorer : traduction de la
+  requête avant retrieval, ou embeddings multilingues dédiés).
