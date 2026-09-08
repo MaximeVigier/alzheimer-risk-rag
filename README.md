@@ -18,12 +18,71 @@ Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méth
 - [x] Reranking (cross-encoder)
 - [x] Génération sourcée avec garde-fous anti-hallucination (Ollama, 100% local)
 - [x] Jeu de test d'évaluation (36 questions, généré semi-automatiquement puis relu)
-- [ ] Évaluation quantitative (recall@k, faithfulness via RAGAS, LLM-as-judge)
-- [ ] Figures scientifiques (comparaison chunking/retrieval, RAG vs zero-shot, UMAP embeddings)
+- [x] Évaluation quantitative (recall@k, faithfulness via RAGAS, LLM-as-judge séparé)
+- [x] Figures scientifiques (comparaison chunking/retrieval, faithfulness par catégorie)
+- [ ] Comparaison RAG vs zero-shot
+- [ ] Visualisation UMAP des embeddings
 - [ ] API FastAPI
 - [ ] Tests + CI GitHub Actions
 - [ ] Dockerfile + docker-compose
-- [ ] README final avec résultats chiffrés
+- [ ] README final avec démo (GIF/vidéo)
+
+## Résultats
+
+Évaluation sur 36 questions (générées semi-automatiquement à partir du corpus, relues et
+corrigées manuellement — voir `eval/testset.jsonl`), juge de faithfulness (RAGAS) = `gpt-oss:20b`,
+**différent** du modèle générateur (`qwen3:14b`), pour éviter le biais d'auto-évaluation.
+
+### Retrieval — ablation par composant (chunking taille fixe)
+
+![Recall@k par mode de retrieval](eval/results/figures/recall_by_mode_fixed.png)
+
+| Mode | Recall@3 | Recall@5 | Recall@10 |
+|---|---|---|---|
+| Dense seul | 0.50 | 0.61 | 0.67 |
+| Sparse (BM25) | 0.67 | 0.72 | 0.83 |
+| Hybride (dense+BM25, RRF) | 0.69 | 0.78 | 0.83 |
+| **Hybride + reranking** | **0.78** | 0.78 | **0.86** |
+
+Chaque étape du pipeline apporte un gain mesurable. Fait notable : BM25 seul bat le dense seul —
+les questions reprennent souvent le vocabulaire technique exact des abstracts (APOE, termes MeSH),
+que la recherche lexicale capture très bien.
+
+### Fidélité des réponses (faithfulness)
+
+**0.925** en moyenne (chunking taille fixe) — chaque affirmation de la réponse est vérifiée par le
+juge comme réellement supportée par le contexte cité, pas juste "à l'air plausible".
+
+![Faithfulness par catégorie](eval/results/figures/faithfulness_by_category_fixed.png)
+
+Sur les questions-pièges (cas où l'abstract source ne répond que partiellement à la question),
+la faithfulness baisse légèrement (0.856 vs 0.931) — signe que le système est bien plus prudent
+face à un contexte ambigu, comportement attendu du garde-fou :
+
+![Robustesse edge cases](eval/results/figures/edge_case_comparison_fixed.png)
+
+### Chunking : taille fixe vs sémantique
+
+Le chunking sémantique **sur-fragmente** les abstracts courts (~48 tokens/chunk en moyenne contre
+~287 pour le chunking taille fixe) — le sujet glisse naturellement entre les phrases d'un abstract
+(contexte → méthode → résultats), donc la similarité cosine entre phrases consécutives tombe vite
+sous le seuil et le découpage coupe presque à chaque phrase.
+
+Résultat : le recall@k reste comparable entre les deux stratégies...
+
+![Comparaison recall chunking](eval/results/figures/chunking_comparison.png)
+
+...mais la faithfulness s'effondre nettement avec le chunking sémantique (0.832 vs 0.925) : un
+contexte trop morcelé nuit à la cohérence de la synthèse du LLM générateur, même quand le bon
+document est techniquement retrouvé.
+
+![Comparaison faithfulness chunking](eval/results/figures/chunking_faithfulness_comparison.png)
+
+**Conclusion** : le chunking sémantique n'est pas une amélioration universelle — il faut l'ajuster
+à la longueur des documents source. Sur des abstracts courts et déjà denses, le chunking à taille
+fixe est le meilleur choix. Il donnerait probablement de meilleurs résultats sur des documents
+longs (full-text), à tester dans une itération future.
+
 
 ## Stack
 Python · Ollama (LLM + embeddings, local) · ChromaDB · rank_bm25 · sentence-transformers

@@ -92,6 +92,27 @@ def fig_chunking_comparison(fixed: dict, semantic: dict):
     print("  -> chunking_comparison.png")
 
 
+def fig_chunking_faithfulness_comparison(fixed: dict, semantic: dict):
+    """Barplot : faithfulness fixed vs semantic — l'écart le plus parlant entre les 2 stratégies
+    (le recall est comparable, mais la sur-fragmentation du chunking sémantique nuit à la
+    cohérence du contexte fourni au LLM générateur, donc à la fidélité de la réponse finale)."""
+    fig, ax = plt.subplots(figsize=(7, 5))
+    labels = ["Chunking taille fixe\n(~287 tokens/chunk)", "Chunking sémantique\n(~48 tokens/chunk, sur-fragmenté)"]
+    values = [fixed["faithfulness"]["faithfulness_mean"], semantic["faithfulness"]["faithfulness_mean"]]
+    bars = ax.bar(labels, values, color=["#4C72B0", "#DD8452"])
+    for bar, v in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width() / 2, v + 0.02, f"{v:.3f}", ha="center", fontsize=12)
+
+    ax.set_ylim(0, 1.05)
+    ax.set_ylabel("Faithfulness (RAGAS)")
+    ax.set_title("Faithfulness par stratégie de chunking\n"
+                 "Le recall est comparable, mais un contexte trop fragmenté\nnuit à la fidélité de la réponse générée")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "chunking_faithfulness_comparison.png", dpi=150)
+    plt.close(fig)
+    print("  -> chunking_faithfulness_comparison.png")
+
+
 def fig_faithfulness_by_category(results: dict, strategy_label: str, out_name: str):
     """Barplot : faithfulness moyenne par catégorie de facteur de risque."""
     data = results.get("faithfulness", {}).get("faithfulness_by_category", {})
@@ -162,6 +183,7 @@ def main():
 
     if fixed and semantic:
         fig_chunking_comparison(fixed, semantic)
+        fig_chunking_faithfulness_comparison(fixed, semantic)
 
     print(f"\nFigures écrites dans {FIG_DIR}/")
 
