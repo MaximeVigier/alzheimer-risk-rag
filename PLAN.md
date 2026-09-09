@@ -195,6 +195,15 @@ avancées de ragas (construction de knowledge graph) non utilisées ici — l'im
 (Faithfulness, AnswerRelevancy, etc.) fonctionne sans lui. Sur Linux (Docker), scikit-network devrait
 compiler normalement avec `build-essential` installé — pas besoin du contournement dans le conteneur.
 
+## Idées futures (non retenues pour l'instant — à ne pas développer)
+- **Modèle prédictif de risque individuel** (08/09/2026) : à partir de quelques critères saisis
+  par l'utilisateur (activité cardiovasculaire, tabac, alcool, exercice, fond génétique type APOE...),
+  estimer un risque de développer Alzheimer. Frein identifié : volume de données individuelles
+  probablement insuffisant pour un modèle fiable à partir du seul corpus PubMed (abstracts agrégés,
+  pas de cohortes patient-level) — resterait un modèle jouet/pédagogique plutôt qu'un outil médical
+  crédible, à formuler avec cette limite explicite si un jour développé. Piste : chercher un dataset
+  public de cohorte (type ADNI, UK Biobank sous accès contrôlé) si l'idée est un jour reprise sérieusement.
+
 ## Ce que ce projet coche dans PROFIL.md
 - NLP/LLM/RAG : preuve publique concrète (trou identifié en priorité)
 - Docker : usage réel, pas un `docker run hello-world`

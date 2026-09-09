@@ -1,0 +1,30 @@
+{
+  "strategy": "fixed",
+  "n_questions": 36,
+  "recall_at_k": {
+    "dense": {
+      "recall@3": 0.5,
+      "recall@5": 0.6111,
+      "recall@10": 0.6667,
+      "n_questions": 36
+    },
+    "sparse": {
+      "recall@3": 0.6667,
+      "recall@5": 0.7222,
+      "recall@10": 0.8333,
+      "n_questions": 36
+    },
+    "hybrid": {
+      "recall@3": 0.6944,
+      "recall@5": 0.7778,
+      "recall@10": 0.8333,
+      "n_questions": 36
+    },
+    "hybrid_rerank": {
+      "recall@3": 0.7778,
+      "recall@5": 0.7778,
+      "recall@10": 0.8611,
+      "n_questions": 36
+    }
+  }
+}

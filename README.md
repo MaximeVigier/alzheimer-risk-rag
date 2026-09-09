@@ -20,8 +20,8 @@ Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méth
 - [x] Jeu de test d'évaluation (36 questions, généré semi-automatiquement puis relu)
 - [x] Évaluation quantitative (recall@k, faithfulness via RAGAS, LLM-as-judge séparé)
 - [x] Figures scientifiques (comparaison chunking/retrieval, faithfulness par catégorie)
-- [ ] Comparaison RAG vs zero-shot
-- [ ] Visualisation UMAP des embeddings
+- [x] Visualisation UMAP des embeddings
+- [ ] Comparaison RAG vs zero-shot (en cours d'exécution)
 - [ ] API FastAPI
 - [ ] Tests + CI GitHub Actions
 - [ ] Dockerfile + docker-compose
@@ -82,6 +82,19 @@ document est techniquement retrouvé.
 à la longueur des documents source. Sur des abstracts courts et déjà denses, le chunking à taille
 fixe est le meilleur choix. Il donnerait probablement de meilleurs résultats sur des documents
 longs (full-text), à tester dans une itération future.
+
+### Structure sémantique du corpus (UMAP)
+
+![UMAP des embeddings](eval/results/figures/umap_embeddings_fixed.png)
+
+Projection UMAP (384 → 2 dimensions) des 1212 chunks indexés, colorés par catégorie de facteur de
+risque taguée automatiquement par mots-clés (le tagging n'intervient à aucun moment dans le calcul
+de l'UMAP, qui ne voit que le texte). Les catégories les plus spécifiques et les moins fréquentes
+(sommeil, activité physique) forment des clusters visuellement nets et isolés — signe que l'espace
+d'embedding capture un vrai signal sémantique cohérent avec le tagging. Le reste du corpus (mode
+de vie, génétique, cardio-métabolique, diète) se chevauche davantage, ce qui est attendu : un
+abstract sur Alzheimer aborde très souvent plusieurs facteurs de risque à la fois (ex. un article
+sur la diète cite aussi APOE ou le profil cardiovasculaire).
 
 
 ## Stack
