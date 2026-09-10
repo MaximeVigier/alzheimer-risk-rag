@@ -21,7 +21,7 @@ Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méth
 - [x] Évaluation quantitative (recall@k, faithfulness via RAGAS, LLM-as-judge séparé)
 - [x] Figures scientifiques (comparaison chunking/retrieval, faithfulness par catégorie)
 - [x] Visualisation UMAP des embeddings
-- [ ] Comparaison RAG vs zero-shot (en cours d'exécution)
+- [x] Comparaison RAG vs zero-shot (n=10, +88% de correctness)
 - [ ] API FastAPI
 - [ ] Tests + CI GitHub Actions
 - [ ] Dockerfile + docker-compose
@@ -96,6 +96,26 @@ de vie, génétique, cardio-métabolique, diète) se chevauche davantage, ce qui
 abstract sur Alzheimer aborde très souvent plusieurs facteurs de risque à la fois (ex. un article
 sur la diète cite aussi APOE ou le profil cardiovasculaire).
 
+
+### RAG vs zero-shot : l'apport réel du retrieval
+
+Même LLM générateur (`qwen3:14b`), avec pipeline RAG complet vs en zero-shot (connaissances
+internes seules, aucun contexte fourni). Métrique : AnswerCorrectness (RAGAS, facticité pure vs
+réponse de référence), jugée par `gpt-oss:20b` — même juge que les autres métriques du projet.
+Échantillon réduit (10 questions sur les 36 du jeu de test complet, coût du LLM-as-judge en local
+oblige) — indicatif, pas une preuve statistique définitive.
+
+| Mode | AnswerCorrectness moyenne |
+|---|---|
+| Zero-shot (sans RAG) | 0.271 |
+| **Avec RAG** | **0.509** |
+
+Le RAG améliore la correctness sur 8 des 10 questions testées (+88% en moyenne). Le seul cas net
+où le zero-shot fait mieux concerne une question de connaissance générale bien établie (facteurs
+de risque vasculaires classiques : diabète, hypertension, tabac) — le LLM la connaît déjà sans
+avoir besoin du corpus, et le contexte récupéré ajoute plutôt du bruit ici.
+
+Détails par question : `eval/results/rag_vs_zeroshot_fixed_1789057726.json`.
 
 ## Stack
 Python · Ollama (LLM + embeddings, local) · ChromaDB · rank_bm25 · sentence-transformers
