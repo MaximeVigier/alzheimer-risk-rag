@@ -24,7 +24,7 @@ Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méth
 - [x] Comparaison RAG vs zero-shot (n=10, +88% de correctness)
 - [x] API FastAPI (`src/api.py` — `/health`, `/ask`)
 - [x] Tests + CI GitHub Actions (23 tests, mocks sur Ollama/ChromaDB pour rester rapides et gratuits)
-- [ ] Dockerfile + docker-compose
+- [x] Dockerfile + docker-compose (build vérifié par CI)
 - [ ] README final avec démo (GIF/vidéo)
 
 ## Résultats
@@ -119,7 +119,7 @@ Détails par question : `eval/results/rag_vs_zeroshot_fixed_1789057726.json`.
 
 ## Stack
 Python · Ollama (LLM + embeddings, local) · ChromaDB · rank_bm25 · sentence-transformers
-(reranking) · RAGAS (évaluation) · FastAPI · pytest + GitHub Actions (CI) · Streamlit (à venir)
+(reranking) · RAGAS (évaluation) · FastAPI · pytest + GitHub Actions (CI) · Docker · Streamlit (à venir)
 
 ## Lancer en local
 
@@ -144,6 +144,24 @@ python src/chat.py --strategy fixed
 # 5. API HTTP (optionnel)
 uvicorn src.api:app --reload --port 8000
 # -> POST http://localhost:8000/ask {"query": "...", "strategy": "fixed"}
+```
+
+## Lancer via Docker
+
+L'image ne contient que le code et les dépendances runtime de l'API (pas les scripts
+d'évaluation) ; l'index vectoriel (`data/chroma`, `data/processed`, `data/bm25_cache`) doit
+être construit en local au préalable (étapes 1-3 ci-dessus) puis est monté en volume.
+
+```bash
+# 1. Démarrer Ollama et récupérer le modèle de génération
+docker compose up -d ollama
+docker compose exec ollama ollama pull qwen3:14b
+
+# 2. Démarrer l'API (build l'image au premier lancement)
+docker compose up --build
+
+curl -X POST http://localhost:8000/ask -H "Content-Type: application/json" \
+     -d '{"query": "does APOE genotype increase Alzheimer risk?"}'
 ```
 
 ## Tests
@@ -172,7 +190,9 @@ configurable dans `src/generate.py`) et le modèle juge pour l'évaluation (`gpt
 │   ├── chat.py         # mode interactif de test
 │   └── api.py          # API FastAPI (/health, /ask)
 ├── tests/              # 23 tests unitaires (chunking, retrieval, génération, API)
-├── .github/workflows/ci.yml  # CI GitHub Actions
+├── .github/workflows/ci.yml  # CI GitHub Actions (tests + build Docker)
+├── Dockerfile          # image API (dépendances runtime uniquement)
+├── docker-compose.yml  # API + Ollama, index monté en volume
 ├── eval/
 │   ├── generate_testset.py  # génération semi-auto du jeu de test
 │   ├── testset.jsonl         # jeu de test relu et validé (36 questions)

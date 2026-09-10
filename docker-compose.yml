@@ -1,0 +1,40 @@
+# Lance l'API RAG + un serveur Ollama local dans deux conteneurs séparés.
+#
+# Prérequis avant le premier `docker compose up` :
+#   1. Construire l'index localement (hors Docker) -- voir README, sections
+#      "Ingestion", "Chunking", "Indexation vectorielle" -- data/chroma, data/processed
+#      et data/bm25_cache doivent exister sur l'hôte : ils sont montés en volume,
+#      pas reconstruits dans l'image (image légère, pas de rebuild à chaque corpus).
+#   2. `docker compose up -d ollama` puis `docker compose exec ollama ollama pull qwen3:14b`
+#      (ou le modèle configuré dans src/generate.py::OLLAMA_MODEL).
+#
+# Usage :
+#   docker compose up --build
+#   curl -X POST http://localhost:8000/ask -H "Content-Type: application/json" \
+#        -d '{"query": "does APOE genotype increase Alzheimer risk?"}'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+
+  api:
+    build: .
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/chroma:/app/data/chroma:ro
+      - ./data/processed:/app/data/processed:ro
+      - ./data/bm25_cache:/app/data/bm25_cache:ro
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
