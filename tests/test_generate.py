@@ -47,8 +47,8 @@ def test_answer_question_refuses_below_score_threshold():
 def test_answer_question_calls_ollama_when_retrieval_strong():
     retriever = MagicMock()
     retriever.search.return_value = [
-        {"pmid": "1", "title": "T", "year": "2020", "url": "u", "text": "relevant chunk",
-         "score": MIN_RRF_SCORE * 10}
+        {"chunk_id": "1_0", "pmid": "1", "title": "T", "year": "2020", "url": "u",
+         "text": "relevant chunk", "score": MIN_RRF_SCORE * 10}
     ]
 
     fake_response = {"message": {"content": "APOE increases risk [PMID: 1]."}}

@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from generate import OLLAMA_MODEL, answer_question
@@ -27,6 +28,15 @@ app = FastAPI(
     description="Question-réponse sourcée sur la littérature scientifique des facteurs de "
                 "risque de la maladie d'Alzheimer (corpus PubMed, RAG 100% local).",
     version="1.0.0",
+)
+
+# CORS ouvert en dev pour permettre au front statique (web/, servi séparément ou en file://)
+# d'appeler l'API depuis un autre port/origine.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Retrievers chargés paresseusement et mis en cache par stratégie : le chargement (embeddings,
@@ -52,6 +62,7 @@ class Source(BaseModel):
     title: str
     year: str | None = None
     url: str
+    chunk_id: str | None = None
 
 
 class AskResponse(BaseModel):
@@ -91,7 +102,8 @@ def ask(request: AskRequest) -> AskResponse:
         answer=result["answer"],
         sources_cited=result["sources_cited"],
         sources=[
-            Source(pmid=s["pmid"], title=s["title"], year=s.get("year"), url=s["url"])
+            Source(pmid=s["pmid"], title=s["title"], year=s.get("year"), url=s["url"],
+                   chunk_id=s.get("chunk_id"))
             for s in result["sources_retrieved"]
         ],
         refused=result["refused"],

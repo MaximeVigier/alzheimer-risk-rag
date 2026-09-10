@@ -98,7 +98,8 @@ def answer_question(query: str, strategy: str = "fixed", retriever: HybridRetrie
         "answer": answer,
         "sources_cited": _extract_cited_pmids(answer),
         "sources_retrieved": [
-            {"pmid": c["pmid"], "title": c["title"], "year": c["year"], "url": c["url"], "text": c["text"]}
+            {"chunk_id": c["chunk_id"], "pmid": c["pmid"], "title": c["title"], "year": c["year"],
+             "url": c["url"], "text": c["text"]}
             for c in top_chunks
         ],
         "refused": False,
