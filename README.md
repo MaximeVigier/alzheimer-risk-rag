@@ -22,8 +22,8 @@ Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méth
 - [x] Figures scientifiques (comparaison chunking/retrieval, faithfulness par catégorie)
 - [x] Visualisation UMAP des embeddings
 - [x] Comparaison RAG vs zero-shot (n=10, +88% de correctness)
-- [ ] API FastAPI
-- [ ] Tests + CI GitHub Actions
+- [x] API FastAPI (`src/api.py` — `/health`, `/ask`)
+- [x] Tests + CI GitHub Actions (23 tests, mocks sur Ollama/ChromaDB pour rester rapides et gratuits)
 - [ ] Dockerfile + docker-compose
 - [ ] README final avec démo (GIF/vidéo)
 
@@ -119,7 +119,7 @@ Détails par question : `eval/results/rag_vs_zeroshot_fixed_1789057726.json`.
 
 ## Stack
 Python · Ollama (LLM + embeddings, local) · ChromaDB · rank_bm25 · sentence-transformers
-(reranking) · RAGAS (évaluation) · FastAPI · Streamlit (à venir)
+(reranking) · RAGAS (évaluation) · FastAPI · pytest + GitHub Actions (CI) · Streamlit (à venir)
 
 ## Lancer en local
 
@@ -140,7 +140,21 @@ python src/embed.py --strategy both
 
 # 4. Chat interactif
 python src/chat.py --strategy fixed
+
+# 5. API HTTP (optionnel)
+uvicorn src.api:app --reload --port 8000
+# -> POST http://localhost:8000/ask {"query": "...", "strategy": "fixed"}
 ```
+
+## Tests
+
+```bash
+pytest -q
+```
+
+23 tests unitaires (chunking, fusion RRF du retrieval, garde-fou de génération, contrat HTTP
+de l'API), tous mockés sur les composants lourds (Ollama, ChromaDB, modèles d'embedding) pour
+rester rapides (<1s) et gratuits en CI. CI GitHub Actions sur chaque push/PR (`.github/workflows/ci.yml`).
 
 Nécessite [Ollama](https://ollama.com) avec un modèle de génération (`qwen3:14b` par défaut,
 configurable dans `src/generate.py`) et le modèle juge pour l'évaluation (`gpt-oss:20b`).
@@ -155,7 +169,10 @@ configurable dans `src/generate.py`) et le modèle juge pour l'évaluation (`gpt
 │   ├── retrieval.py    # retrieval hybride dense + BM25
 │   ├── rerank.py       # reranking cross-encoder
 │   ├── generate.py     # génération sourcée + garde-fous
-│   └── chat.py         # mode interactif de test
+│   ├── chat.py         # mode interactif de test
+│   └── api.py          # API FastAPI (/health, /ask)
+├── tests/              # 23 tests unitaires (chunking, retrieval, génération, API)
+├── .github/workflows/ci.yml  # CI GitHub Actions
 ├── eval/
 │   ├── generate_testset.py  # génération semi-auto du jeu de test
 │   ├── testset.jsonl         # jeu de test relu et validé (36 questions)
