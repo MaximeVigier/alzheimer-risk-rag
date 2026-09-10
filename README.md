@@ -25,6 +25,7 @@ Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méth
 - [x] API FastAPI (`src/api.py` — `/health`, `/ask`)
 - [x] Tests + CI GitHub Actions (23 tests, mocks sur Ollama/ChromaDB pour rester rapides et gratuits)
 - [x] Dockerfile + docker-compose (build vérifié par CI)
+- [x] UI Three.js (chat + nuage de points UMAP 3D interactif, retrieval surligné)
 - [ ] README final avec démo (GIF/vidéo)
 
 ## Résultats
@@ -164,6 +165,32 @@ curl -X POST http://localhost:8000/ask -H "Content-Type: application/json" \
      -d '{"query": "does APOE genotype increase Alzheimer risk?"}'
 ```
 
+## UI Three.js
+
+Interface web statique (`web/`) : chat posant des questions à l'API + visualisation 3D
+interactive du nuage de points UMAP des embeddings du corpus (1212 chunks, réduits de 384 à
+3 dimensions via `eval/make_umap_3d.py`), colorés par catégorie de facteur de risque. Quand
+une question est posée, les chunks effectivement récupérés par le retrieval sont surlignés
+en rose vif et agrandis dans le nuage, les autres points s'atténuent : ça rend concret ce que
+fait le retrieval, pas juste une réponse texte.
+
+Vanilla JS + Three.js (via CDN jsdelivr, importmap dans `index.html`) — pas de build step,
+pas de npm, cohérent avec un projet portfolio gratuit sans infra.
+
+```bash
+# 1. Démarrer l'API (CORS activé en dev, allow_origins="*")
+uvicorn src.api:app --port 8000
+
+# 2. Servir le front statique (autre terminal)
+cd web
+python -m http.server 8080
+# -> ouvrir http://localhost:8080/index.html
+```
+
+L'URL de l'API est configurable en haut de `web/app.js` (`API_BASE_URL`, défaut
+`http://localhost:8000`). Navigation 3D standard : glisser = rotation, molette = zoom, clic
+droit = pan.
+
 ## Tests
 
 ```bash
@@ -196,7 +223,13 @@ configurable dans `src/generate.py`) et le modèle juge pour l'évaluation (`gpt
 ├── eval/
 │   ├── generate_testset.py  # génération semi-auto du jeu de test
 │   ├── testset.jsonl         # jeu de test relu et validé (36 questions)
+│   ├── make_umap_3d.py       # export UMAP 3D pour la visualisation web
 │   └── run_eval.py           # (à venir) métriques recall@k, faithfulness
+├── web/                # UI Three.js (chat + nuage UMAP 3D interactif)
+│   ├── index.html
+│   ├── app.js
+│   ├── style.css
+│   └── data/umap3d_fixed.json
 └── PLAN.md              # plan détaillé et journal de décisions
 ```
 

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Alzheimer Risk RAG — Explorateur</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <section id="chat-panel">
+      <header class="app-header">
+        <h1>Facteurs de risque Alzheimer — RAG</h1>
+        <p>Question-réponse sourcée sur un corpus PubMed (1212 chunks). Les passages
+           effectivement récupérés par le retrieval s'illuminent dans le nuage UMAP à droite.</p>
+        <div id="api-status"><span class="dot"></span><span id="api-status-text">Vérification de l'API...</span></div>
+      </header>
+
+      <div id="chat-history"></div>
+
+      <form id="chat-form">
+        <input id="question-input" type="text" autocomplete="off"
+               placeholder="Ex: Le sommeil influence-t-il le risque d'Alzheimer ?" />
+        <button type="submit" id="ask-button">Envoyer</button>
+      </form>
+    </section>
+
+    <section id="viz-panel">
+      <canvas id="viz-canvas"></canvas>
+      <div id="legend"><div class="legend-title">Catégories</div></div>
+      <div id="viz-info">Chargement du nuage de points UMAP...</div>
+      <div id="loading-overlay"><span>Chargement de la visualisation 3D...</span></div>
+    </section>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
