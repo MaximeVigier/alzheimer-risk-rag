@@ -25,7 +25,7 @@ jobs:
           # avec les modèles lourds (embeddings, LLM local) mockés — pas d'installation
           # d'Ollama ni de téléchargement de modèles en CI.
           pip install fastapi "uvicorn[standard]" pydantic pytest pytest-mock httpx \
-                      rank_bm25 chromadb
+                      rank_bm25 chromadb ollama
 
       - name: Run tests
         run: pytest -q
