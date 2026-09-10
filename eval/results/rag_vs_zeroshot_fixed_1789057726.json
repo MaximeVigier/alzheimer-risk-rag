@@ -1,0 +1,82 @@
+{
+  "strategy": "fixed",
+  "generator_model": "qwen3:14b",
+  "judge_model": "gpt-oss:20b",
+  "n_questions": 10,
+  "rag_correctness_mean": 0.5091,
+  "zero_shot_correctness_mean": 0.2706,
+  "rag_correctness_n": 10,
+  "zero_shot_correctness_n": 10,
+  "per_question": [
+    {
+      "question": "Does ApoE4 genotype status modify the effect of time-restricted feeding (TRF) on cognitive outcomes in Alzheimer's disease patients?",
+      "category": "genetic",
+      "rag_correctness": 0.22222222222222224,
+      "zero_shot_correctness": 0.05714285714285715,
+      "rag_refused": false
+    },
+    {
+      "question": "How does the combination of the APOE ε4 genotype and sleep disorders influence dementia risk compared to individuals without these factors?",
+      "category": "genetic",
+      "rag_correctness": 0.8,
+      "zero_shot_correctness": 0.18181818181818182,
+      "rag_refused": false
+    },
+    {
+      "question": "How does the APOE4 genotype contribute to the risk of late-onset Alzheimer's disease according to the abstract?",
+      "category": "genetic",
+      "rag_correctness": 0.5161290322580646,
+      "zero_shot_correctness": 0.35294117647058826,
+      "rag_refused": false
+    },
+    {
+      "question": "How does APOE ε4 influence the likelihood of visual hallucinations and fluctuating cognition in dementia with Lewy bodies (DLB)?",
+      "category": "genetic",
+      "rag_correctness": 0.7272727272727272,
+      "zero_shot_correctness": 0.0,
+      "rag_refused": false
+    },
+    {
+      "question": "What is the association between specific IDE gene polymorphisms (rs4646953, rs2251101, rs1544210) and Alzheimer's disease according to the meta-analysis?",
+      "category": "genetic",
+      "rag_correctness": 0.888888888888889,
+      "zero_shot_correctness": 0.4545454545454545,
+      "rag_refused": false
+    },
+    {
+      "question": "What mitochondrial-related factors are implicated in Alzheimer's disease progression, and how can lifestyle changes mitigate their impact?",
+      "category": "genetic",
+      "rag_correctness": 0.5714285714285713,
+      "zero_shot_correctness": 0.5714285714285713,
+      "rag_refused": false
+    },
+    {
+      "question": "Are traditional vascular risk factors such as diabetes, hypercholesterolaemia, hypertension, and smoking associated with Alzheimer's disease?",
+      "category": "diet_nutrition",
+      "rag_correctness": 0.0,
+      "zero_shot_correctness": 0.10526315789473685,
+      "rag_refused": false
+    },
+    {
+      "question": "What is the major genetic risk factor for late-onset Alzheimer's disease according to the abstract?",
+      "category": "diet_nutrition",
+      "rag_correctness": 0.4615384615384615,
+      "zero_shot_correctness": 0.42857142857142855,
+      "rag_refused": false
+    },
+    {
+      "question": "What factors are associated with myelin impairments in Alzheimer's disease?",
+      "category": "diet_nutrition",
+      "rag_correctness": 0.7368421052631579,
+      "zero_shot_correctness": 0.15384615384615383,
+      "rag_refused": false
+    },
+    {
+      "question": "What gene is identified as a central player in Alzheimer's disease pathogenesis based on the abstract?",
+      "category": "diet_nutrition",
+      "rag_correctness": 0.16666666666666669,
+      "zero_shot_correctness": 0.4,
+      "rag_refused": false
+    }
+  ]
+}

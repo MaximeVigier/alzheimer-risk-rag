@@ -44,7 +44,7 @@ def _get_correctness_metric():
         from ragas.llms import llm_factory
         from ragas.metrics.collections import AnswerCorrectness
         client = openai.AsyncOpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
-        judge_llm = llm_factory(JUDGE_MODEL, provider="openai", client=client, max_tokens=8192)
+        judge_llm = llm_factory(JUDGE_MODEL, provider="openai", client=client, max_tokens=16384)
         # weights=[1.0, 0.0] : facticité pure jugée par LLM, pas de composante similarité
         # sémantique (qui nécessiterait un modèle d'embeddings ragas séparé).
         _correctness_metric = AnswerCorrectness(llm=judge_llm, weights=[1.0, 0.0])
