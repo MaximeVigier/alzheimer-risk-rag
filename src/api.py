@@ -13,6 +13,13 @@ Endpoints:
 from __future__ import annotations
 
 import logging
+import sys
+from pathlib import Path
+
+# Assure que les imports "à plat" (from generate import ..., from retrieval import ...) marchent
+# quel que soit le mode de lancement : `uvicorn api:app` depuis src/ (src/ déjà sur sys.path)
+# ou `uvicorn src.api:app` depuis la racine du repo (src/ absent du sys.path par défaut).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware

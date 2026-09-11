@@ -20,9 +20,13 @@ from pathlib import Path
 import chromadb
 from rank_bm25 import BM25Okapi
 
-CHROMA_DIR = "data/chroma"
-CHUNKS_DIR = "data/processed"
-BM25_CACHE_DIR = "data/bm25_cache"
+# Chemins ancrés sur la racine du repo (parent de src/), pas sur le cwd : l'API peut être
+# lancée depuis la racine ("uvicorn src.api:app") ou depuis src/ ("uvicorn api:app"), et les
+# deux doivent retrouver le même index sur disque.
+REPO_ROOT = Path(__file__).resolve().parent.parent
+CHROMA_DIR = str(REPO_ROOT / "data" / "chroma")
+CHUNKS_DIR = str(REPO_ROOT / "data" / "processed")
+BM25_CACHE_DIR = str(REPO_ROOT / "data" / "bm25_cache")
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
 
 _embed_model = None
