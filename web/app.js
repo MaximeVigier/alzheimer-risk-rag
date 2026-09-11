@@ -22,13 +22,15 @@ const HIGHLIGHT_COLOR = 0xe11d48;
 
 const BASE_SIZE = 0.045;
 const HIGHLIGHT_SIZE = 0.18;
-const DIM_OPACITY = 0.12;
+const DIM_OPACITY = 0.45;
 const BASE_OPACITY = 0.8;
 
 // ---- État global --------------------------------------------------------
 let points = [];              // métadonnées brutes du JSON
 let pointCloud = null;        // THREE.Points
 let pointMaterial = null;     // ShaderMaterial (uniforms fog exposés pour ajustement futur)
+let networkLines = null;      // THREE.LineSegments (connexions k-NN entre points proches)
+let networkLineOpacityAttr = null;
 let geometry = null;
 let colorAttr = null;
 let sizeAttr = null;
@@ -198,6 +200,61 @@ function buildPointCloud(pts) {
 
   pointCloud = new THREE.Points(geometry, material);
   scene.add(pointCloud);
+
+  buildNetworkLines(pts, positions);
+}
+
+// Relie chaque point à ses k plus proches voisins dans l'espace UMAP (k-NN, brute-force —
+// 1212 points reste largement gérable en une passe au chargement). Rendu en traits fins et
+// pâles, façon "réseau de neurones" : ça donne une structure visuelle à l'ensemble du nuage
+// même quand la majorité des points sont en opacité réduite (retrieval en cours).
+function buildNetworkLines(pts, positions) {
+  const K = 3;
+  const n = pts.length;
+  const edgeSet = new Set();
+  const linePositions = [];
+
+  for (let i = 0; i < n; i++) {
+    const xi = positions[i * 3], yi = positions[i * 3 + 1], zi = positions[i * 3 + 2];
+    const best = []; // { j, d2 }, trié croissant, taille max K
+
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      const dx = positions[j * 3] - xi, dy = positions[j * 3 + 1] - yi, dz = positions[j * 3 + 2] - zi;
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (best.length < K) {
+        best.push({ j, d2 });
+        best.sort((a, b) => a.d2 - b.d2);
+      } else if (d2 < best[K - 1].d2) {
+        best[K - 1] = { j, d2 };
+        best.sort((a, b) => a.d2 - b.d2);
+      }
+    }
+
+    for (const { j } of best) {
+      const key = i < j ? `${i}_${j}` : `${j}_${i}`;
+      if (edgeSet.has(key)) continue;
+      edgeSet.add(key);
+      linePositions.push(xi, yi, zi, positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2]);
+    }
+  }
+
+  const lineGeom = new THREE.BufferGeometry();
+  lineGeom.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0xb0bac6,
+    transparent: true,
+    opacity: 0.22,
+    depthWrite: false,
+  });
+  if (networkLines) {
+    scene.remove(networkLines);
+    networkLines.geometry.dispose();
+    networkLines.material.dispose();
+  }
+  networkLines = new THREE.LineSegments(lineGeom, lineMat);
+  networkLines.renderOrder = -1; // sous les points, jamais par-dessus
+  scene.add(networkLines);
 }
 
 function animate() {
