@@ -1,7 +1,5 @@
 # Alzheimer Risk Factors RAG
 
-🚧 **Projet en cours de construction — commits progressifs, voir l'historique git pour la démarche.**
-
 Assistant de question-réponse sourcé sur la littérature scientifique des facteurs de risque
 de la maladie d'Alzheimer (génétique, mode de vie, métabolique, cardiovasculaire, sommeil,
 activité physique), construit à partir d'un corpus PubMed réel — avec évaluation quantitative
@@ -120,7 +118,7 @@ Détails par question : `eval/results/rag_vs_zeroshot_fixed_1789057726.json`.
 
 ## Stack
 Python · Ollama (LLM + embeddings, local) · ChromaDB · rank_bm25 · sentence-transformers
-(reranking) · RAGAS (évaluation) · FastAPI · pytest + GitHub Actions (CI) · Docker · Streamlit (à venir)
+(reranking) · RAGAS (évaluation) · FastAPI · pytest + GitHub Actions (CI) · Docker · Three.js (interface web)
 
 ## Lancer en local
 
@@ -224,7 +222,7 @@ configurable dans `src/generate.py`) et le modèle juge pour l'évaluation (`gpt
 │   ├── generate_testset.py  # génération semi-auto du jeu de test
 │   ├── testset.jsonl         # jeu de test relu et validé (36 questions)
 │   ├── make_umap_3d.py       # export UMAP 3D pour la visualisation web
-│   └── run_eval.py           # (à venir) métriques recall@k, faithfulness
+│   └── run_eval.py           # métriques recall@k, faithfulness (RAGAS)
 ├── web/                # UI Three.js (chat + nuage UMAP 3D interactif)
 │   ├── index.html
 │   ├── app.js
