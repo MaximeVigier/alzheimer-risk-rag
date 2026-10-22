@@ -3,12 +3,9 @@
 Assistant de question-réponse sourcé sur la littérature scientifique des facteurs de risque
 de la maladie d'Alzheimer (génétique, mode de vie, métabolique, cardiovasculaire, sommeil,
 activité physique), construit à partir d'un corpus PubMed réel — avec évaluation quantitative
-du retrieval et de la fidélité des réponses, pas juste une démo qui a l'air de marcher.
+du retrieval et de la fidélité des réponses.
 
-## Pourquoi ce projet
-Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méthodologiques, étapes).
-
-## État d'avancement
+## Pipeline
 - [x] Ingestion PubMed (1198 abstracts, API E-utilities)
 - [x] Chunking — 2 stratégies comparées (taille fixe vs découpage sémantique)
 - [x] Embeddings + indexation ChromaDB (local, gratuit)
@@ -24,7 +21,6 @@ Voir [`PLAN.md`](PLAN.md) pour la démarche complète (architecture, choix méth
 - [x] Tests + CI GitHub Actions (23 tests, mocks sur Ollama/ChromaDB pour rester rapides et gratuits)
 - [x] Dockerfile + docker-compose (build vérifié par CI)
 - [x] UI Three.js (chat + nuage de points UMAP 3D interactif, retrieval surligné)
-- [ ] README final avec démo (GIF/vidéo)
 
 ## Résultats
 
@@ -43,14 +39,14 @@ corrigées manuellement — voir `eval/testset.jsonl`), juge de faithfulness (RA
 | Hybride (dense+BM25, RRF) | 0.69 | 0.78 | 0.83 |
 | **Hybride + reranking** | **0.78** | 0.78 | **0.86** |
 
-Chaque étape du pipeline apporte un gain mesurable. Fait notable : BM25 seul bat le dense seul —
+Chaque étape du pipeline apporte un gain mesurable. BM25 seul bat le dense seul :
 les questions reprennent souvent le vocabulaire technique exact des abstracts (APOE, termes MeSH),
 que la recherche lexicale capture très bien.
 
 ### Fidélité des réponses (faithfulness)
 
-**0.925** en moyenne (chunking taille fixe) — chaque affirmation de la réponse est vérifiée par le
-juge comme réellement supportée par le contexte cité, pas juste "à l'air plausible".
+**0.925** en moyenne (chunking taille fixe) : le juge vérifie que chaque affirmation de la réponse
+est supportée par le contexte cité.
 
 ![Faithfulness par catégorie](eval/results/figures/faithfulness_by_category_fixed.png)
 
@@ -77,7 +73,7 @@ document est techniquement retrouvé.
 
 ![Comparaison faithfulness chunking](eval/results/figures/chunking_faithfulness_comparison.png)
 
-**Conclusion** : le chunking sémantique n'est pas une amélioration universelle — il faut l'ajuster
+**Conclusion** : le chunking sémantique n'est pas une amélioration universelle, il doit être ajusté
 à la longueur des documents source. Sur des abstracts courts et déjà denses, le chunking à taille
 fixe est le meilleur choix. Il donnerait probablement de meilleurs résultats sur des documents
 longs (full-text), à tester dans une itération future.
@@ -169,11 +165,11 @@ Interface web statique (`web/`) : chat posant des questions à l'API + visualisa
 interactive du nuage de points UMAP des embeddings du corpus (1212 chunks, réduits de 384 à
 3 dimensions via `eval/make_umap_3d.py`), colorés par catégorie de facteur de risque. Quand
 une question est posée, les chunks effectivement récupérés par le retrieval sont surlignés
-en rose vif et agrandis dans le nuage, les autres points s'atténuent : ça rend concret ce que
-fait le retrieval, pas juste une réponse texte.
+en rose vif et agrandis dans le nuage, les autres points s'atténuent : ce qui montre ce que
+fait le retrieval en plus de la réponse texte.
 
-Vanilla JS + Three.js (via CDN jsdelivr, importmap dans `index.html`) — pas de build step,
-pas de npm, cohérent avec un projet portfolio gratuit sans infra.
+Vanilla JS + Three.js (via CDN jsdelivr, importmap dans `index.html`) — sans build step
+ni npm.
 
 ```bash
 # 1. Démarrer l'API (CORS activé en dev, allow_origins="*")
@@ -223,12 +219,11 @@ configurable dans `src/generate.py`) et le modèle juge pour l'évaluation (`gpt
 │   ├── testset.jsonl         # jeu de test relu et validé (36 questions)
 │   ├── make_umap_3d.py       # export UMAP 3D pour la visualisation web
 │   └── run_eval.py           # métriques recall@k, faithfulness (RAGAS)
-├── web/                # UI Three.js (chat + nuage UMAP 3D interactif)
-│   ├── index.html
-│   ├── app.js
-│   ├── style.css
-│   └── data/umap3d_fixed.json
-└── PLAN.md              # plan détaillé et journal de décisions
+└── web/                # UI Three.js (chat + nuage UMAP 3D interactif)
+    ├── index.html
+    ├── app.js
+    ├── style.css
+    └── data/umap3d_fixed.json
 ```
 
 ## Limites (mises à jour au fil du projet)
